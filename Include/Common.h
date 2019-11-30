@@ -1,3 +1,5 @@
+#ifndef _COMMON_H_
+#define _COMMON_H_
 typedef bit                   BIT;
 typedef unsigned char         UINT8;
 typedef unsigned int          UINT16;
@@ -34,3 +36,4 @@ UINT8 Receive_Data_From_UART1(void);
 void  InitialUART1(UINT32 u32Baudrate);
 
 extern bit BIT_TMP;
+#endif

@@ -3,6 +3,8 @@ N76E003.H
 
 Header file for Nuvoton N76E003
 --------------------------------------------------------------------------*/
+#ifndef _N76E003_H_
+#define _N76E003_H_
 
 sfr P0					= 0x80;
 sfr SP					= 0x81;
@@ -283,7 +285,7 @@ sbit P01				= P0^1;
 sbit MISO				= P0^1;
 sbit P00				= P0^0;
 sbit MOSI				= P0^0;
-
+#endif
 
 
 

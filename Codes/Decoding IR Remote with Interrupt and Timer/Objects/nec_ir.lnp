@@ -1,4 +1,5 @@
 ".\Objects\main.obj",
+".\Objects\ir_rx.obj",
 ".\Objects\Common.obj",
 ".\Objects\Delay.obj",
 ".\Objects\STARTUP.obj" 

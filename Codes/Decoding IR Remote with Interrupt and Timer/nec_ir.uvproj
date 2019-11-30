@@ -381,6 +381,11 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
+            <File>
+              <FileName>ir_rx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ir_rx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
