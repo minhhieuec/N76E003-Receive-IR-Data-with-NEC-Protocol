@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 10:57:44 PAGE 1   
+C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 11:49:09 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE DELAY
@@ -62,7 +62,7 @@ line level    source
   44   1          {
   45   2              TL0 = LOBYTE(TIMER_DIV12_VALUE_1ms);    //Find  define in "Function_define.h" "TIMER VALUE"
   46   2              TH0 = HIBYTE(TIMER_DIV12_VALUE_1ms);
-C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 10:57:44 PAGE 2   
+C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 11:49:09 PAGE 2   
 
   47   2              while (TF0 != 1);                       //Check Timer0 Time-Out Flag
   48   2              clr_TF0;
@@ -126,7 +126,7 @@ line level    source
  106   1          set_TR3;                                    //Trigger Timer3
  107   1          while (u32CNT != 0)
  108   1          {
-C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 10:57:44 PAGE 3   
+C51 COMPILER V9.60.0.0   DELAY                                                             11/30/2019 11:49:09 PAGE 3   
 
  109   2              RL3 = LOBYTE(TIMER_DIV4_VALUE_10us); //Find  define in "Function_define.h" "TIMER VALUE"
  110   2              RH3 = HIBYTE(TIMER_DIV4_VALUE_10us);

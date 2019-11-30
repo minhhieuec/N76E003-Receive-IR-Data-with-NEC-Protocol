@@ -1,4 +1,4 @@
-A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 10:57:44 PAGE     1
+A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 11:49:09 PAGE     1
 
 
 MACRO ASSEMBLER A51 V8.2.7.0
@@ -65,7 +65,7 @@ LOC  OBJ            LINE     SOURCE
                       55     ;------------------------------------------------------------------------------
                       56     ;
                       57     ;  Page Definition for Using the Compact Model with 64 KByte xdata RAM
-A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 10:57:44 PAGE     2
+A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 11:49:09 PAGE     2
 
                       58     ;
                       59     ;  The following EQU statements define the xdata page used for pdata
@@ -133,7 +133,7 @@ LOC  OBJ            LINE     SOURCE
                                              MOV     R6,#HIGH (XDATALEN)
                                ENDIF
 001F E4              123                     CLR     A
-A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 10:57:44 PAGE     3
+A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 11:49:09 PAGE     3
 
 0020 F0              124     XDATALOOP:      MOVX    @DPTR,A
 0021 A3              125                     INC     DPTR
@@ -179,7 +179,7 @@ LOC  OBJ            LINE     SOURCE
 0029 020000   F      165                     LJMP    ?C_START
                      166     
                      167                     END
-A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 10:57:44 PAGE     4
+A51 MACRO ASSEMBLER  STARTUP                                                              11/30/2019 11:49:09 PAGE     4
 
 SYMBOL TABLE LISTING
 ------ ----- -------

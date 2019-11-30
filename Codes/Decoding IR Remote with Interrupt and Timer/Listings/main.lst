@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 10:57:44 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -9,191 +9,221 @@ COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c LARGE OPTIMIZE(8,SPEED) B
 
 line level    source
 
-   1          #include "N76E003.h"
-   2          #include "SFR_Macro.h"
-   3          #include "Function_define.h"
-   4          #include "Common.h"
-   5          #include "Delay.h"
-   6          //#include "soft_delay.h"
-   7          //#include "LCD_2_Wire.h"
-   8          #define delay_ms(x) Timer2_Delay500us(x * 2)
-   9          
-  10          #define debug printf
-  11          
-  12          #if 0
+   1          /*
+   2           *  @author:  MinhHieuEC
+   3           *  @date:    30/11/2019
+   4           */
+   5          #include "N76E003.h"
+   6          #include "SFR_Macro.h"
+   7          #include "Function_define.h"
+   8          #include "Common.h"
+   9          #include "Delay.h"
+  10          
+  11          #define delay_ms(x) Timer2_Delay500us(x * 2)
+  12          #define debug printf
+  13          
+  14          #if 0
               #define sync_high 12000  // 9ms
               #define sync_low 6000    // 4.5ms
-              #define one_high 3600    // 560us
+              #define one_high 3600    // 3600 × 0.75ms = 2.7ms
               #define one_low 2400     // 2400 × 0.75ms = 1.8ms
               #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
               #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
               #else
-  20          #define sync_high 22000  // 22000 × 0.75ms = 16.5ms
-  21          #define sync_low 14000   // 14000 × 0.75ms = 10.5ms
-  22          #define one_high 3600    // 3600 × 0.75ms = 2.7ms
-  23          #define one_low 2400     // 2400 × 0.75ms = 1.8ms
-  24          #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
-  25          #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
-  26          #endif
-  27          
-  28          //  1 is start ir byte
-  29          #define IR_RECEIVE_BYTE 64 + 1
-  30          
-  31          bit received;
-  32          unsigned char bits = 0;
-  33          unsigned int frames[IR_RECEIVE_BYTE];
-  34          
-  35          bit is_ir_start = 0;
-  36          bit is_first_ir_time = 0;
+  22          #define sync_high 22000  // 22000 × 0.75ms = 16.5ms
+  23          #define sync_low 14000   // 14000 × 0.75ms = 10.5ms
+  24          #define one_high 3600    // 3600 × 0.75ms = 2.7ms
+  25          #define one_low 2400     // 2400 × 0.75ms = 1.8ms
+  26          #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
+  27          #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
+  28          #endif
+  29          
+  30          //  1 is start ir byte
+  31          #define IR_DATA_NUM_BYTES 8
+  32          #define IR_RECEIVE_BYTE ((IR_DATA_NUM_BYTES * 8) + 1)
+  33          
+  34          bit received;
+  35          unsigned char bits = 0;
+  36          unsigned int frames[IR_RECEIVE_BYTE];
   37          
-  38          void setup(void);
-  39          void set_Timer_0(unsigned int value);
-  40          unsigned int get_Timer_0(void);
-  41          void erase_frames(void);
-  42          unsigned char decode(unsigned char start_pos, unsigned char end_pos);
-  43          void decode_NEC(unsigned char *addr, unsigned char *cmd);
-  44          
-  45          char putchar(char c) {
-  46   1        while (!TI)
-  47   1          ;
-  48   1        TI = 0;
-  49   1        return (SBUF = c);
-  50   1      }
-  51          
-  52          void EXTI1_ISR(void) interrupt 2 {
-  53   1        if (is_ir_start) {
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 10:57:44 PAGE 2   
+  38          bit is_ir_start = 0;
+  39          bit is_first_ir_time = 0;
+  40          
+  41          void setup(void);
+  42          void set_Timer_0(unsigned int value);
+  43          unsigned int get_Timer_0(void);
+  44          void erase_frames(void);
+  45          unsigned char decode(unsigned char start_pos, unsigned char end_pos);
+  46          void decode_NEC(unsigned char *addr, unsigned char *cmd);
+  47          void decode_NEC_IR(void);
+  48          
+  49          char putchar(char c) {
+  50   1        while (!TI)
+  51   1          ;
+  52   1        TI = 0;
+  53   1        return (SBUF = c);
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 2   
 
-  54   2          frames[bits] = get_Timer_0();
-  55   2          bits++;
-  56   2      
-  57   2          set_Timer_0(0x0000);
-  58   2          set_TR0;
-  59   2      
-  60   2          if (bits >= IR_RECEIVE_BYTE) {
-  61   3            received = 1;
-  62   3            clr_EA;
-  63   3            clr_TR0;
-  64   3          }
-  65   2        } else {
-  66   2          //  detect first start sync
-  67   2          if (is_first_ir_time == 0) {
-  68   3            is_ir_start = 1;
-  69   3            set_TR0;
-  70   3            is_first_ir_time = 1;
-  71   3          } else {
-  72   3            //  remove end ir send
-  73   3            is_first_ir_time = 0;
-  74   3          }
-  75   2        }
-  76   1      
-  77   1        P03 = ~P03;
-  78   1      }
-  79          
-  80          void main(void) {
-  81   1        unsigned char address = 0x00;
-  82   1        unsigned char command = 0x00;
-  83   1        uint8_t i = 0;
-  84   1      
-  85   1        setup();
-  86   1      
-  87   1        while (1) {
-  88   2          if (received) {
-  89   3            for (i = 0; i < IR_RECEIVE_BYTE; i++) {
-  90   4              debug("frame[%d]: %lld \r\n", (uint16_t)i, (uint32_t)frames[i]);
-  91   4            }
-  92   3      
-  93   3            //   decode_NEC(&address, &command);
-  94   3            //   debug("address: %x \r\n", address);
-  95   3            //   debug("command: %x \r\n", command);
+  54   1      }
+  55          
+  56          void EXTI1_ISR(void) interrupt 2 {
+  57   1        if (is_ir_start) {
+  58   2          frames[bits] = get_Timer_0();
+  59   2          bits++;
+  60   2      
+  61   2          set_Timer_0(0x0000);
+  62   2          set_TR0;
+  63   2      
+  64   2          if (bits >= IR_RECEIVE_BYTE) {
+  65   3            received = 1;
+  66   3            clr_EA;
+  67   3            clr_TR0;
+  68   3          }
+  69   2        } else {
+  70   2          //  detect first start sync
+  71   2          if (is_first_ir_time == 0) {
+  72   3            is_ir_start = 1;
+  73   3            set_TR0;
+  74   3            is_first_ir_time = 1;
+  75   3          } else {
+  76   3            //  remove end ir send
+  77   3            is_first_ir_time = 0;
+  78   3          }
+  79   2        }
+  80   1      
+  81   1        P03 = ~P03;
+  82   1      }
+  83          
+  84          void main(void) {
+  85   1        unsigned char address = 0x00;
+  86   1        unsigned char command = 0x00;
+  87   1        uint8_t i = 0;
+  88   1      
+  89   1        setup();
+  90   1      
+  91   1        while (1) {
+  92   2          if (received) {
+  93   3            for (i = 0; i < IR_RECEIVE_BYTE; i++) {
+  94   4              debug("frame[%d]: %lld \r\n", (uint16_t)i, (uint32_t)frames[i]);
+  95   4            }
   96   3      
-  97   3            delay_ms(100);
-  98   3            erase_frames();
-  99   3            set_EA;
- 100   3          }
- 101   2        };
- 102   1      }
- 103          
- 104          void setup(void) {
- 105   1        InitialUART0_Timer1(115200);
- 106   1        printf("main \r\n");
- 107   1      
- 108   1        erase_frames();
- 109   1        P03_PushPull_Mode;
- 110   1        TIMER0_MODE1_ENABLE;
- 111   1        set_Timer_0(0x0000);
- 112   1        set_IT1;
- 113   1        set_EX1;
- 114   1        set_EA;
- 115   1      }
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 10:57:44 PAGE 3   
+  97   3            // decode_NEC(&address, &command);
+  98   3            // debug("address: %x \r\n", address);
+  99   3            // debug("command: %x \r\n", command);
+ 100   3            decode_NEC_IR();
+ 101   3      
+ 102   3            delay_ms(100);
+ 103   3            erase_frames();
+ 104   3            set_EA;
+ 105   3          }
+ 106   2        };
+ 107   1      }
+ 108          
+ 109          void setup(void) {
+ 110   1        InitialUART0_Timer1(115200);
+ 111   1        printf("main \r\n");
+ 112   1      
+ 113   1        erase_frames();
+ 114   1        P03_PushPull_Mode;
+ 115   1        TIMER0_MODE1_ENABLE;
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 3   
 
- 116          
- 117          void set_Timer_0(unsigned int value) {
- 118   1        TH0 = ((value && 0xFF00) >> 8);
- 119   1        TL0 = (value & 0x00FF);
+ 116   1        set_Timer_0(0x0000);
+ 117   1        set_IT1;
+ 118   1        set_EX1;
+ 119   1        set_EA;
  120   1      }
  121          
- 122          unsigned int get_Timer_0(void) {
- 123   1        unsigned int value = 0x0000;
- 124   1      
- 125   1        value = TH0;
- 126   1        value <<= 8;
- 127   1        value |= TL0;
- 128   1      
- 129   1        return value;
- 130   1      }
- 131          
- 132          void erase_frames(void) {
- 133   1        for (bits = 0; bits < IR_RECEIVE_BYTE; bits++) {
- 134   2          frames[bits] = 0;
- 135   2        }
- 136   1      
- 137   1        set_Timer_0(0x0000);
- 138   1        received = 0;
- 139   1        bits = 0;
- 140   1        is_ir_start = 0;
- 141   1      }
- 142          
- 143          unsigned char decode(unsigned char start_pos, unsigned char end_pos) {
- 144   1        unsigned char value = 0;
- 145   1      
- 146   1        for (bits = start_pos; bits <= end_pos; bits++) {
- 147   2          value <<= 1;
- 148   2      
- 149   2          if ((frames[bits] >= one_low) && (frames[bits] <= one_high)) {
- 150   3            value |= 1;
- 151   3          }
- 152   2      
- 153   2          else if ((frames[bits] >= zero_low) && (frames[bits] <= zero_high)) {
- 154   3            value |= 0;
- 155   3          }
- 156   2      
- 157   2          else if ((frames[bits] >= sync_low) && (frames[bits] <= sync_high)) {
- 158   3            return 0xFF;
- 159   3          }
- 160   2        }
- 161   1      
- 162   1        return value;
- 163   1      }
- 164          
- 165          void decode_NEC(unsigned char *addr, unsigned char *cmd) {
- 166   1        *addr = decode(2, 9);
- 167   1        *cmd = decode(18, 25);
+ 122          void set_Timer_0(unsigned int value) {
+ 123   1        TH0 = ((value && 0xFF00) >> 8);
+ 124   1        TL0 = (value & 0x00FF);
+ 125   1      }
+ 126          
+ 127          unsigned int get_Timer_0(void) {
+ 128   1        unsigned int value = 0x0000;
+ 129   1      
+ 130   1        value = TH0;
+ 131   1        value <<= 8;
+ 132   1        value |= TL0;
+ 133   1      
+ 134   1        return value;
+ 135   1      }
+ 136          
+ 137          void erase_frames(void) {
+ 138   1        for (bits = 0; bits < IR_RECEIVE_BYTE; bits++) {
+ 139   2          frames[bits] = 0;
+ 140   2        }
+ 141   1      
+ 142   1        set_Timer_0(0x0000);
+ 143   1        received = 0;
+ 144   1        bits = 0;
+ 145   1        is_ir_start = 0;
+ 146   1      }
+ 147          
+ 148          unsigned char decode(unsigned char start_pos, unsigned char end_pos) {
+ 149   1        unsigned char value = 0;
+ 150   1      
+ 151   1        for (bits = start_pos; bits <= end_pos; bits++) {
+ 152   2          value <<= 1;
+ 153   2      
+ 154   2          if ((frames[bits] >= one_low) && (frames[bits] <= one_high)) {
+ 155   3            value |= 1;
+ 156   3          }
+ 157   2      
+ 158   2          else if ((frames[bits] >= zero_low) && (frames[bits] <= zero_high)) {
+ 159   3            value |= 0;
+ 160   3          }
+ 161   2      
+ 162   2          else if ((frames[bits] >= sync_low) && (frames[bits] <= sync_high)) {
+ 163   3            return 0xFF;
+ 164   3          }
+ 165   2        }
+ 166   1      
+ 167   1        return value;
  168   1      }
+ 169          
+ 170          void decode_NEC(unsigned char *addr, unsigned char *cmd) {
+ 171   1        *addr = decode(1, 8);
+ 172   1        *cmd = decode(17, 24);
+ 173   1      }
+ 174          
+ 175          void decode_NEC_IR(void) {
+ 176   1        uint8_t ir_data[8];
+ 177   1        uint8_t i;
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 4   
+
+ 178   1      
+ 179   1        ir_data[0] = decode(1, 8);
+ 180   1        ir_data[1] = decode(9, 16);
+ 181   1        ir_data[2] = decode(17, 24);
+ 182   1        ir_data[3] = decode(15, 32);
+ 183   1      
+ 184   1        // for (i = 0; i < 32; i++) {
+ 185   1        //   frames[33 + i] = frames[i + 1];
+ 186   1        // }
+ 187   1      
+ 188   1        ir_data[4] = decode(33, 40);
+ 189   1        ir_data[5] = decode(41, 48);
+ 190   1        ir_data[6] = decode(49, 56);
+ 191   1        ir_data[7] = decode(57, 64);
+ 192   1      
+ 193   1        debug("%x %x %x %x | %x %x %x %x\r\n", (uint16_t)ir_data[0],
+ 194   1              (uint16_t)ir_data[1], (uint16_t)ir_data[2], (uint16_t)ir_data[3],
+ 195   1              (uint16_t)ir_data[4], (uint16_t)ir_data[5], (uint16_t)ir_data[6],
+ 196   1              (uint16_t)ir_data[7]);
+ 197   1      }
+*** WARNING C280 IN LINE 177 OF main.c: 'i': unreferenced local variable
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    581    ----
-   CONSTANT SIZE    =     27    ----
-   XDATA SIZE       =    131       9
+   CODE SIZE        =    786    ----
+   CONSTANT SIZE    =     55    ----
+   XDATA SIZE       =    131      18
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 10:57:44 PAGE 4   
-
    BIT SIZE         =      3    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

@@ -1,18 +1,20 @@
+/*
+ *	@author:	MinhHieuEC
+ *	@date:		30/11/2019
+ */
 #include "N76E003.h"
 #include "SFR_Macro.h"
 #include "Function_define.h"
 #include "Common.h"
 #include "Delay.h"
-//#include "soft_delay.h"
-//#include "LCD_2_Wire.h"
-#define delay_ms(x) Timer2_Delay500us(x * 2)
 
+#define delay_ms(x) Timer2_Delay500us(x * 2)
 #define debug printf
 
 #if 0
 #define sync_high 12000  // 9ms
 #define sync_low 6000    // 4.5ms
-#define one_high 3600    // 560us
+#define one_high 3600    // 3600 × 0.75ms = 2.7ms
 #define one_low 2400     // 2400 × 0.75ms = 1.8ms
 #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
 #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
@@ -26,7 +28,8 @@
 #endif
 
 //	1 is start ir byte
-#define IR_RECEIVE_BYTE 64 + 1
+#define IR_DATA_NUM_BYTES 8
+#define IR_RECEIVE_BYTE ((IR_DATA_NUM_BYTES * 8) + 1)
 
 bit received;
 unsigned char bits = 0;
@@ -41,6 +44,7 @@ unsigned int get_Timer_0(void);
 void erase_frames(void);
 unsigned char decode(unsigned char start_pos, unsigned char end_pos);
 void decode_NEC(unsigned char *addr, unsigned char *cmd);
+void decode_NEC_IR(void);
 
 char putchar(char c) {
   while (!TI)
@@ -90,9 +94,10 @@ void main(void) {
         debug("frame[%d]: %lld \r\n", (uint16_t)i, (uint32_t)frames[i]);
       }
 
-      //   decode_NEC(&address, &command);
-      //   debug("address: %x \r\n", address);
-      //   debug("command: %x \r\n", command);
+      // decode_NEC(&address, &command);
+      // debug("address: %x \r\n", address);
+      // debug("command: %x \r\n", command);
+      decode_NEC_IR();
 
       delay_ms(100);
       erase_frames();
@@ -163,6 +168,30 @@ unsigned char decode(unsigned char start_pos, unsigned char end_pos) {
 }
 
 void decode_NEC(unsigned char *addr, unsigned char *cmd) {
-  *addr = decode(2, 9);
-  *cmd = decode(18, 25);
+  *addr = decode(1, 8);
+  *cmd = decode(17, 24);
+}
+
+void decode_NEC_IR(void) {
+  uint8_t ir_data[8];
+  uint8_t i;
+
+  ir_data[0] = decode(1, 8);
+  ir_data[1] = decode(9, 16);
+  ir_data[2] = decode(17, 24);
+  ir_data[3] = decode(15, 32);
+
+  // for (i = 0; i < 32; i++) {
+  //   frames[33 + i] = frames[i + 1];
+  // }
+
+  ir_data[4] = decode(33, 40);
+  ir_data[5] = decode(41, 48);
+  ir_data[6] = decode(49, 56);
+  ir_data[7] = decode(57, 64);
+
+  debug("%x %x %x %x | %x %x %x %x\r\n", (uint16_t)ir_data[0],
+        (uint16_t)ir_data[1], (uint16_t)ir_data[2], (uint16_t)ir_data[3],
+        (uint16_t)ir_data[4], (uint16_t)ir_data[5], (uint16_t)ir_data[6],
+        (uint16_t)ir_data[7]);
 }
