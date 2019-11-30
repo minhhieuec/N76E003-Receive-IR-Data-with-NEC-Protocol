@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 1   
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 13:36:55 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
@@ -22,197 +22,185 @@ line level    source
   11          #define delay_ms(x) Timer2_Delay500us(x * 2)
   12          #define debug printf
   13          
-  14          #if 0
-              #define sync_high 12000  // 9ms
-              #define sync_low 6000    // 4.5ms
-              #define one_high 3600    // 3600 × 0.75ms = 2.7ms
-              #define one_low 2400     // 2400 × 0.75ms = 1.8ms
-              #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
-              #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
-              #else
-  22          #define sync_high 22000  // 22000 × 0.75ms = 16.5ms
-  23          #define sync_low 14000   // 14000 × 0.75ms = 10.5ms
-  24          #define one_high 3600    // 3600 × 0.75ms = 2.7ms
-  25          #define one_low 2400     // 2400 × 0.75ms = 1.8ms
-  26          #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
-  27          #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
-  28          #endif
+  14          // {0xAA, 0x0A, 0x48, 0xD0, 0x30, 0x22, 0x59, 0x71}
+  15          #define sync_high 12000  // 9ms
+  16          #define sync_low 6000    // 4.5ms
+  17          #define one_high 3600    // 3600 × 0.75ms = 2.7ms
+  18          #define one_low 2400     // 2400 × 0.75ms = 1.8ms
+  19          #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
+  20          #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
+  21          
+  22          //  1 is start ir byte
+  23          #define IR_DATA_NUM_BYTES 8
+  24          #define IR_RECEIVE_BYTE ((IR_DATA_NUM_BYTES * 8) + 1)
+  25          
+  26          bit received;
+  27          unsigned char bits = 0;
+  28          unsigned int frames[IR_RECEIVE_BYTE];
   29          
-  30          //  1 is start ir byte
-  31          #define IR_DATA_NUM_BYTES 8
-  32          #define IR_RECEIVE_BYTE ((IR_DATA_NUM_BYTES * 8) + 1)
-  33          
-  34          bit received;
-  35          unsigned char bits = 0;
-  36          unsigned int frames[IR_RECEIVE_BYTE];
-  37          
-  38          bit is_ir_start = 0;
-  39          bit is_first_ir_time = 0;
+  30          bit is_ir_start = 0;
+  31          bit is_first_ir_time = 0;
+  32          
+  33          void setup(void);
+  34          void set_Timer_0(unsigned int value);
+  35          unsigned int get_Timer_0(void);
+  36          void erase_frames(void);
+  37          unsigned char decode(unsigned char start_pos, unsigned char end_pos);
+  38          void decode_NEC(unsigned char *addr, unsigned char *cmd);
+  39          void decode_NEC_IR(void);
   40          
-  41          void setup(void);
-  42          void set_Timer_0(unsigned int value);
-  43          unsigned int get_Timer_0(void);
-  44          void erase_frames(void);
-  45          unsigned char decode(unsigned char start_pos, unsigned char end_pos);
-  46          void decode_NEC(unsigned char *addr, unsigned char *cmd);
-  47          void decode_NEC_IR(void);
-  48          
-  49          char putchar(char c) {
-  50   1        while (!TI)
-  51   1          ;
-  52   1        TI = 0;
-  53   1        return (SBUF = c);
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 2   
+  41          char putchar(char c) {
+  42   1        while (!TI)
+  43   1          ;
+  44   1        TI = 0;
+  45   1        return (SBUF = c);
+  46   1      }
+  47          
+  48          void EXTI1_ISR(void) interrupt 2 {
+  49   1        if (is_ir_start) {
+  50   2          frames[bits] = get_Timer_0();
+  51   2          bits++;
+  52   2      
+  53   2          set_Timer_0(0x0000);
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 13:36:55 PAGE 2   
 
-  54   1      }
-  55          
-  56          void EXTI1_ISR(void) interrupt 2 {
-  57   1        if (is_ir_start) {
-  58   2          frames[bits] = get_Timer_0();
-  59   2          bits++;
-  60   2      
-  61   2          set_Timer_0(0x0000);
-  62   2          set_TR0;
-  63   2      
-  64   2          if (bits >= IR_RECEIVE_BYTE) {
-  65   3            received = 1;
-  66   3            clr_EA;
-  67   3            clr_TR0;
-  68   3          }
-  69   2        } else {
-  70   2          //  detect first start sync
-  71   2          if (is_first_ir_time == 0) {
-  72   3            is_ir_start = 1;
-  73   3            set_TR0;
-  74   3            is_first_ir_time = 1;
-  75   3          } else {
-  76   3            //  remove end ir send
-  77   3            is_first_ir_time = 0;
-  78   3          }
-  79   2        }
+  54   2          set_TR0;
+  55   2      
+  56   2          if (bits >= IR_RECEIVE_BYTE) {
+  57   3            received = 1;
+  58   3            clr_EA;
+  59   3            clr_TR0;
+  60   3          }
+  61   2        } else {
+  62   2          //  detect first start sync
+  63   2          if (is_first_ir_time == 0) {
+  64   3            is_ir_start = 1;
+  65   3            set_TR0;
+  66   3            is_first_ir_time = 1;
+  67   3          } else {
+  68   3            //  remove end ir send
+  69   3            is_first_ir_time = 0;
+  70   3          }
+  71   2        }
+  72   1      
+  73   1        P03 = ~P03;
+  74   1      }
+  75          
+  76          void main(void) {
+  77   1        unsigned char address = 0x00;
+  78   1        unsigned char command = 0x00;
+  79   1        uint8_t i = 0;
   80   1      
-  81   1        P03 = ~P03;
-  82   1      }
-  83          
-  84          void main(void) {
-  85   1        unsigned char address = 0x00;
-  86   1        unsigned char command = 0x00;
-  87   1        uint8_t i = 0;
-  88   1      
-  89   1        setup();
-  90   1      
-  91   1        while (1) {
-  92   2          if (received) {
-  93   3            for (i = 0; i < IR_RECEIVE_BYTE; i++) {
-  94   4              debug("frame[%d]: %lld \r\n", (uint16_t)i, (uint32_t)frames[i]);
-  95   4            }
-  96   3      
-  97   3            // decode_NEC(&address, &command);
-  98   3            // debug("address: %x \r\n", address);
-  99   3            // debug("command: %x \r\n", command);
- 100   3            decode_NEC_IR();
- 101   3      
- 102   3            delay_ms(100);
- 103   3            erase_frames();
- 104   3            set_EA;
- 105   3          }
- 106   2        };
- 107   1      }
- 108          
- 109          void setup(void) {
- 110   1        InitialUART0_Timer1(115200);
- 111   1        printf("main \r\n");
- 112   1      
- 113   1        erase_frames();
- 114   1        P03_PushPull_Mode;
- 115   1        TIMER0_MODE1_ENABLE;
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 3   
+  81   1        setup();
+  82   1      
+  83   1        while (1) {
+  84   2          if (received) {
+  85   3            for (i = 0; i < IR_RECEIVE_BYTE; i++) {
+  86   4              debug("frame[%d]: %lld \r\n", (uint16_t)i, (uint32_t)frames[i]);
+  87   4            }
+  88   3      
+  89   3            // decode_NEC(&address, &command);
+  90   3            // debug("address: %x \r\n", address);
+  91   3            // debug("command: %x \r\n", command);
+  92   3            decode_NEC_IR();
+  93   3      
+  94   3            delay_ms(100);
+  95   3            erase_frames();
+  96   3            set_EA;
+  97   3          }
+  98   2        };
+  99   1      }
+ 100          
+ 101          void setup(void) {
+ 102   1        InitialUART0_Timer1(115200);
+ 103   1        printf("main \r\n");
+ 104   1      
+ 105   1        erase_frames();
+ 106   1        P03_PushPull_Mode;
+ 107   1        TIMER0_MODE1_ENABLE;
+ 108   1        set_Timer_0(0x0000);
+ 109   1        set_IT1;
+ 110   1        set_EX1;
+ 111   1        set_EA;
+ 112   1      }
+ 113          
+ 114          void set_Timer_0(unsigned int value) {
+ 115   1        TH0 = ((value && 0xFF00) >> 8);
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 13:36:55 PAGE 3   
 
- 116   1        set_Timer_0(0x0000);
- 117   1        set_IT1;
- 118   1        set_EX1;
- 119   1        set_EA;
- 120   1      }
- 121          
- 122          void set_Timer_0(unsigned int value) {
- 123   1        TH0 = ((value && 0xFF00) >> 8);
- 124   1        TL0 = (value & 0x00FF);
- 125   1      }
- 126          
- 127          unsigned int get_Timer_0(void) {
- 128   1        unsigned int value = 0x0000;
- 129   1      
- 130   1        value = TH0;
- 131   1        value <<= 8;
- 132   1        value |= TL0;
+ 116   1        TL0 = (value & 0x00FF);
+ 117   1      }
+ 118          
+ 119          unsigned int get_Timer_0(void) {
+ 120   1        unsigned int value = 0x0000;
+ 121   1      
+ 122   1        value = TH0;
+ 123   1        value <<= 8;
+ 124   1        value |= TL0;
+ 125   1      
+ 126   1        return value;
+ 127   1      }
+ 128          
+ 129          void erase_frames(void) {
+ 130   1        for (bits = 0; bits < IR_RECEIVE_BYTE; bits++) {
+ 131   2          frames[bits] = 0;
+ 132   2        }
  133   1      
- 134   1        return value;
- 135   1      }
- 136          
- 137          void erase_frames(void) {
- 138   1        for (bits = 0; bits < IR_RECEIVE_BYTE; bits++) {
- 139   2          frames[bits] = 0;
- 140   2        }
- 141   1      
- 142   1        set_Timer_0(0x0000);
- 143   1        received = 0;
- 144   1        bits = 0;
- 145   1        is_ir_start = 0;
- 146   1      }
- 147          
- 148          unsigned char decode(unsigned char start_pos, unsigned char end_pos) {
- 149   1        unsigned char value = 0;
- 150   1      
- 151   1        for (bits = start_pos; bits <= end_pos; bits++) {
- 152   2          value <<= 1;
+ 134   1        set_Timer_0(0x0000);
+ 135   1        received = 0;
+ 136   1        bits = 0;
+ 137   1        is_ir_start = 0;
+ 138   1      }
+ 139          
+ 140          unsigned char decode(unsigned char start_pos, unsigned char end_pos) {
+ 141   1        unsigned char value = 0;
+ 142   1      
+ 143   1        for (bits = start_pos; bits <= end_pos; bits++) {
+ 144   2          value <<= 1;
+ 145   2      
+ 146   2          if ((frames[bits] >= one_low) && (frames[bits] <= one_high)) {
+ 147   3            value |= 1;
+ 148   3          }
+ 149   2      
+ 150   2          else if ((frames[bits] >= zero_low) && (frames[bits] <= zero_high)) {
+ 151   3            value |= 0;
+ 152   3          }
  153   2      
- 154   2          if ((frames[bits] >= one_low) && (frames[bits] <= one_high)) {
- 155   3            value |= 1;
+ 154   2          else if ((frames[bits] >= sync_low) && (frames[bits] <= sync_high)) {
+ 155   3            return 0xFF;
  156   3          }
- 157   2      
- 158   2          else if ((frames[bits] >= zero_low) && (frames[bits] <= zero_high)) {
- 159   3            value |= 0;
- 160   3          }
- 161   2      
- 162   2          else if ((frames[bits] >= sync_low) && (frames[bits] <= sync_high)) {
- 163   3            return 0xFF;
- 164   3          }
- 165   2        }
- 166   1      
- 167   1        return value;
- 168   1      }
- 169          
- 170          void decode_NEC(unsigned char *addr, unsigned char *cmd) {
- 171   1        *addr = decode(1, 8);
- 172   1        *cmd = decode(17, 24);
- 173   1      }
- 174          
- 175          void decode_NEC_IR(void) {
- 176   1        uint8_t ir_data[8];
- 177   1        uint8_t i;
-C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 11:49:09 PAGE 4   
+ 157   2        }
+ 158   1      
+ 159   1        return value;
+ 160   1      }
+ 161          
+ 162          void decode_NEC(unsigned char *addr, unsigned char *cmd) {
+ 163   1        *addr = decode(1, 8);
+ 164   1        *cmd = decode(17, 24);
+ 165   1      }
+ 166          
+ 167          void decode_NEC_IR(void) {
+ 168   1        uint8_t ir_data[8];
+ 169   1        uint8_t i;
+ 170   1      
+ 171   1        ir_data[0] = decode(1, 8);
+ 172   1        ir_data[1] = decode(9, 16);
+ 173   1        ir_data[2] = decode(17, 24);
+ 174   1        ir_data[3] = decode(15, 32);
+ 175   1      
+ 176   1        ir_data[4] = decode(33, 40);
+ 177   1        ir_data[5] = decode(41, 48);
+C51 COMPILER V9.60.0.0   MAIN                                                              11/30/2019 13:36:55 PAGE 4   
 
- 178   1      
- 179   1        ir_data[0] = decode(1, 8);
- 180   1        ir_data[1] = decode(9, 16);
- 181   1        ir_data[2] = decode(17, 24);
- 182   1        ir_data[3] = decode(15, 32);
- 183   1      
- 184   1        // for (i = 0; i < 32; i++) {
- 185   1        //   frames[33 + i] = frames[i + 1];
- 186   1        // }
- 187   1      
- 188   1        ir_data[4] = decode(33, 40);
- 189   1        ir_data[5] = decode(41, 48);
- 190   1        ir_data[6] = decode(49, 56);
- 191   1        ir_data[7] = decode(57, 64);
- 192   1      
- 193   1        debug("%x %x %x %x | %x %x %x %x\r\n", (uint16_t)ir_data[0],
- 194   1              (uint16_t)ir_data[1], (uint16_t)ir_data[2], (uint16_t)ir_data[3],
- 195   1              (uint16_t)ir_data[4], (uint16_t)ir_data[5], (uint16_t)ir_data[6],
- 196   1              (uint16_t)ir_data[7]);
- 197   1      }
-*** WARNING C280 IN LINE 177 OF main.c: 'i': unreferenced local variable
+ 178   1        ir_data[6] = decode(49, 56);
+ 179   1        ir_data[7] = decode(57, 64);
+ 180   1      
+ 181   1        debug("%x %x %x %x | %x %x %x %x\r\n", (uint16_t)ir_data[0],
+ 182   1              (uint16_t)ir_data[1], (uint16_t)ir_data[2], (uint16_t)ir_data[3],
+ 183   1              (uint16_t)ir_data[4], (uint16_t)ir_data[5], (uint16_t)ir_data[6],
+ 184   1              (uint16_t)ir_data[7]);
+ 185   1      }
+*** WARNING C280 IN LINE 169 OF main.c: 'i': unreferenced local variable
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE

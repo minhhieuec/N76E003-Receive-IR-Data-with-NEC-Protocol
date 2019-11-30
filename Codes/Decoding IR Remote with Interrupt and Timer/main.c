@@ -11,21 +11,13 @@
 #define delay_ms(x) Timer2_Delay500us(x * 2)
 #define debug printf
 
-#if 0
+// {0xAA, 0x0A, 0x48, 0xD0, 0x30, 0x22, 0x59, 0x71}
 #define sync_high 12000  // 9ms
 #define sync_low 6000    // 4.5ms
 #define one_high 3600    // 3600 × 0.75ms = 2.7ms
 #define one_low 2400     // 2400 × 0.75ms = 1.8ms
 #define zero_high 1800   // 1800 × 0.75ms = 1.35ms
 #define zero_low 1200    // 1200 × 0.75ms = 0.9ms
-#else
-#define sync_high 22000  // 22000 × 0.75ms = 16.5ms
-#define sync_low 14000   // 14000 × 0.75ms = 10.5ms
-#define one_high 3600    // 3600 × 0.75ms = 2.7ms
-#define one_low 2400     // 2400 × 0.75ms = 1.8ms
-#define zero_high 1800   // 1800 × 0.75ms = 1.35ms
-#define zero_low 1200    // 1200 × 0.75ms = 0.9ms
-#endif
 
 //	1 is start ir byte
 #define IR_DATA_NUM_BYTES 8
@@ -180,10 +172,6 @@ void decode_NEC_IR(void) {
   ir_data[1] = decode(9, 16);
   ir_data[2] = decode(17, 24);
   ir_data[3] = decode(15, 32);
-
-  // for (i = 0; i < 32; i++) {
-  //   frames[33 + i] = frames[i + 1];
-  // }
 
   ir_data[4] = decode(33, 40);
   ir_data[5] = decode(41, 48);
