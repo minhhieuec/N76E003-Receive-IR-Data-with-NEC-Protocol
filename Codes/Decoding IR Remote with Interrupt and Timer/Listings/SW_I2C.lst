@@ -1,0 +1,15 @@
+C51 COMPILER V9.60.0.0   SW_I2C                                                            11/30/2019 10:56:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SW_I2C
+OBJECT MODULE PLACED IN .\Objects\SW_I2C.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\..\My_Libraries\2 Wire LCD  (Software Delay)\SW_I2C.c LARGE OPTIMIZE(
+                    -8,SPEED) BROWSE INCDIR(..\..\Include;..\..\My_Libraries\2 Wire LCD  (Software Delay);..\..\My_Libraries\Software Delay) 
+                    -DEFINE(FOSC_160000) DEBUG OBJECTEXTEND PRINT(.\Listings\SW_I2C.lst) TABS(2) OBJECT(.\Objects\SW_I2C.obj)
+
+line level    source
+
+*** ERROR C318 OF ..\..\My_Libraries\2 Wire LCD  (Software Delay)\SW_I2C.c: can't open file '..\..\My_Libraries\2 Wire L
+             -CD  (Software Delay)\SW_I2C.c'
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  1 ERROR(S)

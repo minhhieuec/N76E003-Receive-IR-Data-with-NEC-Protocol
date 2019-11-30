@@ -1,0 +1,15 @@
+C51 COMPILER V9.60.0.0   PCF8574                                                           11/30/2019 10:56:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PCF8574
+OBJECT MODULE PLACED IN .\Objects\PCF8574.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\..\My_Libraries\2 Wire LCD  (Software Delay)\PCF8574.c LARGE OPTIMIZE
+                    -(8,SPEED) BROWSE INCDIR(..\..\Include;..\..\My_Libraries\2 Wire LCD  (Software Delay);..\..\My_Libraries\Software Delay)
+                    - DEFINE(FOSC_160000) DEBUG OBJECTEXTEND PRINT(.\Listings\PCF8574.lst) TABS(2) OBJECT(.\Objects\PCF8574.obj)
+
+line level    source
+
+*** ERROR C318 OF ..\..\My_Libraries\2 Wire LCD  (Software Delay)\PCF8574.c: can't open file '..\..\My_Libraries\2 Wire 
+             -LCD  (Software Delay)\PCF8574.c'
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  1 ERROR(S)

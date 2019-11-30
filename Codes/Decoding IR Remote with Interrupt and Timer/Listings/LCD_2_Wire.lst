@@ -1,0 +1,15 @@
+C51 COMPILER V9.60.0.0   LCD_2_WIRE                                                        11/30/2019 10:56:13 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LCD_2_WIRE
+OBJECT MODULE PLACED IN .\Objects\LCD_2_Wire.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\..\My_Libraries\2 Wire LCD  (Software Delay)\LCD_2_Wire.c LARGE OPTIM
+                    -IZE(8,SPEED) BROWSE INCDIR(..\..\Include;..\..\My_Libraries\2 Wire LCD  (Software Delay);..\..\My_Libraries\Software Del
+                    -ay) DEFINE(FOSC_160000) DEBUG OBJECTEXTEND PRINT(.\Listings\LCD_2_Wire.lst) TABS(2) OBJECT(.\Objects\LCD_2_Wire.obj)
+
+line level    source
+
+*** ERROR C318 OF ..\..\My_Libraries\2 Wire LCD  (Software Delay)\LCD_2_Wire.c: can't open file '..\..\My_Libraries\2 Wi
+             -re LCD  (Software Delay)\LCD_2_Wire.c'
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  1 ERROR(S)
