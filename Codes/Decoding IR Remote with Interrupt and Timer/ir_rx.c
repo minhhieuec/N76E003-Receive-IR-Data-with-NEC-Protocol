@@ -1,17 +1,18 @@
 /*
  *	@author:	MinhHieuEC
  *	@date:		30/11/2019
+ */
 #include "ir_rx.h"
 
 #define delay_ms(x) Timer2_Delay500us(x * 2)
 #define debug printf
 
-#define sync_high 12000  // 12000 × 0.75ms = 9ms
-#define sync_low 6000    // 6000 × 0.75ms = 4.5ms
-#define one_high 3600    // 3600 × 0.75ms = 2.7ms
-#define one_low 2400     // 2400 × 0.75ms = 1.8ms
-#define zero_high 1800   // 1800 × 0.75ms = 1.35ms
-#define zero_low 1200    // 1200 × 0.75ms = 0.9ms
+#define sync_high          17000 // 22000 Ã 0.75ms = 16.5ms
+#define sync_low           12000 // 14000 Ã 0.75ms = 10.5ms
+#define one_high            3600 // 3600 Ã 0.75ms = 2.7ms
+#define one_low             2000 // 2400 Ã 0.75ms = 1.8ms
+#define zero_high           1800 // 1800 Ã 0.75ms = 1.35ms
+#define zero_low            800 // 1200 Ã 0.75ms = 0.9ms
 
 //	1: start ir byte + IR_DATA_NUM_BYTES*8 bytes data
 #define IR_DATA_NUM_BYTES 8
@@ -29,28 +30,26 @@ unsigned int get_Timer_0(void);
 unsigned char decode(unsigned char start_pos, unsigned char end_pos);
 
 void EXTI1_ISR(void) interrupt 2 {
-  if (is_ir_start) {
-    frames[bits] = get_Timer_0();
-    bits++;
+	frames[bits] = get_Timer_0();
 
-    set_Timer_0(0x0000);
-    set_TR0;
+  // detect start
+  if (frames[bits] > 17000 && frames[bits] < 20000) is_ir_start = 1;
 
-    if (bits >= IR_RECEIVE_BYTE) {
-      received = 1;
-      clr_EA;
-      clr_TR0;
-    }
-  } else {
-    //	detect first start sync
-    if (is_first_ir_time == 0) {
-      is_ir_start = 1;
-      set_TR0;
-      is_first_ir_time = 1;
-    } else {
-      //	remove end ir before get new start sync
-      is_first_ir_time = 0;
-    }
+  if (is_ir_start) bits++;
+
+  set_Timer_0(0x0000);
+  set_TR0;
+
+  //  frame error detect
+  if (frames[bits] < 0) {
+    is_ir_start = 0;
+    bits = 0;
+  }
+
+  if (bits >= IR_RECEIVE_BYTE) {
+    received = 1;
+    clr_EA;
+    clr_TR0;
   }
 }
 
