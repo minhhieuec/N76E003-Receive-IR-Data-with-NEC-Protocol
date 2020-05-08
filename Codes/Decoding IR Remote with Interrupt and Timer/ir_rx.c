@@ -86,7 +86,7 @@ void EXTI1_ISR(void) interrupt 2
 
 void PinInterrupt_ISR(void) interrupt 7
 {
-  if (PIF == 0x05)
+  if (PIF == 0x20)
   {
     frames[bits] = get_Timer_0();
 

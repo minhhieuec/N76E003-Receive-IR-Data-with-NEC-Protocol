@@ -31,12 +31,12 @@ void main(void)
   InitialUART0_Timer1(115200);
   printf("main \r\n");
 
-  //P05_Input_Mode;
-//Enable_INT_Port0;
-  // Enable_BIT5_LowLevel_Trig;
-  //Enable_BIT5_FallEdge_Trig;
+  P05_Input_Mode;
+	Enable_INT_Port0;
+  //Enable_BIT5_LowLevel_Trig;
+  Enable_BIT5_FallEdge_Trig;
 
-  ir_rx_setup(IR_USE_EXT1_IT);
+  ir_rx_setup(IR_USE_PIN_IT);
 
   while (1)
   {
