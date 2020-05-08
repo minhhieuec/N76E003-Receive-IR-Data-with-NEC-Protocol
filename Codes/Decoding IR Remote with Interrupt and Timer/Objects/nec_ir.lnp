@@ -1,8 +1,0 @@
-".\Objects\main.obj",
-".\Objects\ir_rx.obj",
-".\Objects\Common.obj",
-".\Objects\Delay.obj",
-".\Objects\STARTUP.obj" 
-TO ".\Objects\nec_ir" 
-PRINT(".\Listings\nec_ir.m51") RAMSIZE(256) 
-DISABLEWARNING (16) 
