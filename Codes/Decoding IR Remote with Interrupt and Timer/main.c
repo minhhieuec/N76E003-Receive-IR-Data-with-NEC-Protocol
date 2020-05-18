@@ -30,13 +30,21 @@ void main(void)
 
   InitialUART0_Timer1(115200);
   printf("main \r\n");
+	
+	P12_PushPull_Mode;
+	P03_PushPull_Mode;
+	P04_PushPull_Mode;
+	
+	P12 = 0;
+	P03 = 0;
+	P04 = 0;
 
-  P05_Input_Mode;
-	Enable_INT_Port0;
+  //P05_Input_Mode;
+	//Enable_INT_Port0;
   //Enable_BIT5_LowLevel_Trig;
-  Enable_BIT5_FallEdge_Trig;
+  //Enable_BIT5_FallEdge_Trig;
 
-  ir_rx_setup(IR_USE_PIN_IT);
+  ir_rx_setup(IR_USE_EXT1_IT);
 
   while (1)
   {
@@ -44,14 +52,14 @@ void main(void)
     {
       get_ir_data(&ir_data[0], IR_DATA_LEN);
 
-      if (ir_data[2] == 0x30 && ir_data[3] == 0xCF)
+      if (ir_data[2] == 0x48 && ir_data[3] == 0xb7)
       {
         led_stt[0] = ~led_stt[0];
         printf("P12: %d \n", (uint16_t)led_stt[0]);
         if (led_stt[0])
-          P12 = 1;
+          P03 = 1;
         else
-          P12 = 0;
+          P03 = 0;
       }
 
       if (ir_data[2] == 0x18 && ir_data[3] == 0xE7)
@@ -59,9 +67,9 @@ void main(void)
         led_stt[1] = ~led_stt[1];
         printf("P03: %d \n", (uint16_t)led_stt[1]);
         if (led_stt[1])
-          P03 = 1;
+          P12 = 1;
         else
-          P03 = 0;
+          P12 = 0;
       }
 
       if (ir_data[2] == 0x7A && ir_data[3] == 0x85)
@@ -74,7 +82,7 @@ void main(void)
           P04 = 0;
       }
 
-      delay_ms(1);
+      delay_ms(100);
 
       printf("ir_rec: ");
       for (i = 0; i < IR_DATA_LEN; i++)
@@ -84,6 +92,6 @@ void main(void)
       printf("\n");
     }
 
-    delay_ms(10);
+    delay_ms(1);
   }
 }

@@ -1,0 +1,5 @@
+Load "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\Objects\\nec_ir" 
+_____^
+*** error 56: can't open file
+Error: Flash Download failed  -  Could not load file 'c:\Users\MinhHieuEC\Desktop\N76E003-Receive-IR-Data-with-NEC-Protocol-master\Codes\Decoding IR Remote with Interrupt and Timer\Objects\nec_ir'
+Flash Load finished at 14:21:03

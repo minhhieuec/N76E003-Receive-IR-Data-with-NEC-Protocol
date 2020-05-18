@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "keil",
+            "includePath": [
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\..\\..\\Include",
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\..\\..\\My_Libraries\\2 Wire LCD  (Software Delay)",
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\..\\..\\My_Libraries\\Software Delay",
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\.",
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\..\\..\\Common",
+                "c:\\Users\\MinhHieuEC\\Desktop\\N76E003-Receive-IR-Data-with-NEC-Protocol-master\\Codes\\Decoding IR Remote with Interrupt and Timer\\..\\..\\Startup"
+            ],
+            "defines": [
+                "__C51__",
+                "__KEIL_ASSISTANT__",
+                "reentrant=",
+                "conpact=",
+                "small=",
+                "large=",
+                "data=",
+                "idata=",
+                "pdata=",
+                "xdata=",
+                "code=",
+                "bit=char",
+                "sbit=char",
+                "sfr=char",
+                "sfr16=int",
+                "sfr32=int",
+                "_interrupt(x)=",
+                "_using(x)=",
+                "_at(x)=",
+                "FOSC_160000"
+            ],
+            "intelliSenseMode": "${default}"
+        }
+    ],
+    "version": 4
+}
